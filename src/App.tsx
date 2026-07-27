@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import TaskListView from './components/TaskListView';
 import CalendarView from './components/CalendarView';
@@ -20,6 +20,7 @@ function useDarkMode() {
 export default function App() {
   const [view, setView] = useState<ViewId>({ kind: 'today' });
   const [dark, setDark] = useDarkMode();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const tasks = useStore((s) => s.tasks);
   const habits = useStore((s) => s.habits);
@@ -65,12 +66,23 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100">
-      <Sidebar view={view} setView={setView} />
-      <main className="flex-1 overflow-y-auto">
-        <div className="flex justify-end px-4 pt-3">
+      <Sidebar
+        view={view}
+        setView={setView}
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <main className="safe-area-shell flex-1 overflow-y-auto">
+        <div className="flex items-center justify-between px-4 pt-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="rounded p-1.5 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 md:hidden"
+          >
+            <Menu size={20} />
+          </button>
           <button
             onClick={() => setDark(!dark)}
-            className="rounded p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="ml-auto rounded p-1.5 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             {dark ? <Sun size={16} /> : <Moon size={16} />}
           </button>

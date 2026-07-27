@@ -52,7 +52,10 @@ export default function TaskModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 pt-16" onClick={onClose}>
+    <div
+      className="safe-area-shell fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 pt-16"
+      onClick={onClose}
+    >
       <div
         className="w-full max-w-lg rounded-xl bg-white p-4 shadow-xl dark:bg-gray-900"
         onClick={(e) => e.stopPropagation()}

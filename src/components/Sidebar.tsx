@@ -14,9 +14,13 @@ function isSameView(a: ViewId, b: ViewId) {
 export default function Sidebar({
   view,
   setView,
+  open,
+  onClose,
 }: {
   view: ViewId;
   setView: (v: ViewId) => void;
+  open: boolean;
+  onClose: () => void;
 }) {
   const projects = useStore((s) => s.projects);
   const tasks = useStore((s) => s.tasks);
@@ -24,6 +28,11 @@ export default function Sidebar({
   const deleteProject = useStore((s) => s.deleteProject);
   const [addingProject, setAddingProject] = useState(false);
   const [newProjectName, setNewProjectName] = useState('');
+
+  const go = (v: ViewId) => {
+    setView(v);
+    onClose();
+  };
 
   const countFor = (projectId: string) =>
     tasks.filter((t) => t.projectId === projectId && !t.completed).length;
@@ -61,38 +70,50 @@ export default function Sidebar({
   );
 
   return (
-    <aside className="flex h-full w-64 shrink-0 flex-col gap-1 overflow-y-auto border-r border-gray-100 bg-gray-50/60 p-3 dark:border-gray-800 dark:bg-gray-950">
+    <>
+      {open && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+      <aside
+        className={`safe-area-shell fixed inset-y-0 left-0 z-40 flex h-full w-64 shrink-0 -translate-x-full flex-col gap-1 overflow-y-auto border-r border-gray-100 bg-gray-50/60 p-3 transition-transform duration-200 dark:border-gray-800 dark:bg-gray-950 md:static md:translate-x-0 md:transition-none ${
+          open ? 'translate-x-0' : ''
+        }`}
+      >
       <NavItem
         icon={<Inbox size={17} />}
         label="Entrada"
         active={isSameView(view, { kind: 'project', id: 'inbox' })}
-        onClick={() => setView({ kind: 'project', id: 'inbox' })}
+        onClick={() => go({ kind: 'project', id: 'inbox' })}
         count={countFor('inbox')}
       />
       <NavItem
         icon={<CalendarDays size={17} />}
         label="Hoje"
         active={isSameView(view, { kind: 'today' })}
-        onClick={() => setView({ kind: 'today' })}
+        onClick={() => go({ kind: 'today' })}
         count={todayCount}
       />
       <NavItem
         icon={<CalendarClock size={17} />}
         label="Em breve"
         active={isSameView(view, { kind: 'upcoming' })}
-        onClick={() => setView({ kind: 'upcoming' })}
+        onClick={() => go({ kind: 'upcoming' })}
       />
       <NavItem
         icon={<ListChecks size={17} />}
         label="Calendário"
         active={isSameView(view, { kind: 'calendar' })}
-        onClick={() => setView({ kind: 'calendar' })}
+        onClick={() => go({ kind: 'calendar' })}
       />
       <NavItem
         icon={<Repeat size={17} />}
         label="Hábitos"
         active={isSameView(view, { kind: 'habits' })}
-        onClick={() => setView({ kind: 'habits' })}
+        onClick={() => go({ kind: 'habits' })}
       />
 
       <div className="mt-4 flex items-center justify-between px-2.5">
@@ -133,7 +154,7 @@ export default function Sidebar({
                 icon={<Hash size={16} color={p.color} />}
                 label={p.name}
                 active={isSameView(view, { kind: 'project', id: p.id })}
-                onClick={() => setView({ kind: 'project', id: p.id })}
+                onClick={() => go({ kind: 'project', id: p.id })}
                 count={countFor(p.id)}
               />
             </div>
@@ -145,6 +166,7 @@ export default function Sidebar({
             </button>
           </div>
         ))}
-    </aside>
+      </aside>
+    </>
   );
 }
